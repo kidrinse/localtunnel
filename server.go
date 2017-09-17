@@ -5,8 +5,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/inconshreveable/go-vhost"
-	"github.com/progrium/duplex/poc2/duplex"
+	"github.com/michlabs/duplex/poc2/duplex"
+	"github.com/michlabs/go-vhost"
 )
 
 func server(backendListen, frontendListen string) {
@@ -49,16 +49,19 @@ func server(backendListen, frontendListen string) {
 			vhostListener, err := mux.Listen(meta.RemotePeer())
 			if err != nil {
 				log.Println(err)
+				continue
 			}
 			go func() {
 				for {
 					conn, err := vhostListener.Accept()
 					if err != nil {
 						log.Println(err)
+						continue
 					}
 					tunnelCh, err := ch.Open("", nil)
 					if err != nil {
 						log.Println(err)
+						continue
 					}
 					go tunnelCh.Join(conn)
 				}

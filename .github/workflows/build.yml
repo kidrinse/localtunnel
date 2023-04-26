@@ -1,0 +1,42 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+    permissions: write-all
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.19
+
+    - name: Init
+      run : go mod init github.com/kidrinse/localtunnel
+    - name: Get Depends
+      run: |
+        go get github.com/michlabs/go-vhost
+        go get github.com/michlabs/duplex/poc2/duplex
+    - name: Build
+      run: go build -o /bin/localtunnel.exe .
+
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: /bin/localtunnel.exe
+        asset_name: localtunnel.exe
+        tag: Latest
+        overwrite: true
+        body: "windows release"
